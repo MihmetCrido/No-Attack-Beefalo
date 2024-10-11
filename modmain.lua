@@ -17,24 +17,25 @@ local function ReplaceIsAlly(self)
                guy.replica.combat:GetTarget() ~= self.inst then
 
                 if guy:HasTag("beefalo") then
-                    local hasowner = guy.replica.follower:GetLeader() or nil
-                    if (hasowner ~= nil) then
+                    local hasowner = guy.replica and guy.replica.follower and guy.replica.follower:GetLeader() or nil
+                    if hasowner ~= nil then
                         return true
                     end
                 end	
-        
-                --must use force attack on players' followers
-                local follower = guy.replica.follower
+
+                -- Must use force attack on players' followers
+                local follower = guy.replica and guy.replica.follower
                 if follower ~= nil then
                     local leader = follower:GetLeader()
                     if leader ~= nil and
                         leader:HasTag("player") and
-                        leader.replica.combat:GetTarget() ~= inst then
+                        leader.replica and
+                        leader.replica.combat and
+                        leader.replica.combat:GetTarget() ~= self.inst then
                         return false
                     end
                 end
             end
-
         end
 
         return IsAlly_original(self, guy, ...)
@@ -42,3 +43,4 @@ local function ReplaceIsAlly(self)
 end
 
 AddClassPostConstruct("components/combat_replica", ReplaceIsAlly)
+
